@@ -27,11 +27,11 @@ services:
       GEVENT_PORT: 8071 # No cambiar, Nginx lo redirige internamente. Usado para longpolling (Websockets) cuando hay mas de 1 worker
       # Postgres
       DB_HOST: ${POSTGRES_HOST}
-      DB_PORT: ${EXTERNAL_PORT_POSTGRES}
+      DB_PORT: 5432
       PGUSER: ${POSTGRES_USER}
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGHOST: ${POSTGRES_HOST}
-      PGPORT: ${EXTERNAL_PORT_POSTGRES}
+      PGPORT: 5432
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       # Odoo
       SMTP_SERVER: mailhog
