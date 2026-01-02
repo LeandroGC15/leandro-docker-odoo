@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extensión de la vista de producto para mostrar cross-selling -->
+    <record id="product_template_form_view_cross_sell" model="ir.ui.view">
+        <field name="name">product.template.form.cross.sell</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Añadir botón para ver reglas de cross-selling -->
+            <div name="button_box" position="inside">
+                <button name="action_view_cross_sell_rules"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-exchange"
+                        groups="sales_team.group_sale_manager">
+                    <field name="cross_sell_count" widget="statinfo" string="Cross-Selling"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <!-- Extensión del formulario de producto para añadir pestaña de cross-selling -->
+    <record id="product_template_form_view_cross_sell_tab" model="ir.ui.view">
+        <field name="name">product.template.form.cross.sell.tab</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales']" position="after">
+                <page string="Cross-Selling" name="cross_selling" 
+                      groups="sales_team.group_sale_manager">
+                    <group>
+                        <p class="text-muted">
+                            <i class="fa fa-info-circle"/>
+                            Configure qué productos se sugerirán automáticamente 
+                            cuando este producto se añada a un pedido de venta.
+                        </p>
+                    </group>
+                    <field name="cross_sell_ids" mode="tree">
+                        <tree string="Productos Cross-Selling" editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="suggested_product_tmpl_id" 
+                                   options="{'no_create': True}"
+                                   domain="[('id', '!=', parent.id)]"/>
+                            <field name="bidirectional" widget="boolean_toggle"/>
+                            <field name="description" optional="hide"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <button name="action_add_cross_sell"
+                                type="object"
+                                string="Añadir Regla de Cross-Selling"
+                                class="btn-secondary"
+                                icon="fa-plus"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vista tree de productos con columna de cross-sell -->
+    <record id="product_template_tree_view_cross_sell" model="ir.ui.view">
+        <field name="name">product.template.tree.cross.sell</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="list_price" position="after">
+                <field name="cross_sell_count" string="Cross-Sells" optional="hide"
+                       groups="sales_team.group_sale_manager"/>
+            </field>
+        </field>
+    </record>
+</odoo>
+

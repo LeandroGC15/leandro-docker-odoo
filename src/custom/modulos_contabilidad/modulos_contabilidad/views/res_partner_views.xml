@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extender vista de formulario de res.partner -->
+    <record id="view_partner_form_inherit_discount_rule" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.discount.rule</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="discount_rule_id" 
+                       options="{'no_create_edit': True}"
+                       placeholder="Seleccionar tipo de cliente"/>
+                <field name="customer_type" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extender vista tree de res.partner -->
+    <record id="view_partner_tree_inherit_discount_rule" model="ir.ui.view">
+        <field name="name">res.partner.tree.inherit.discount.rule</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="after">
+                <field name="customer_type" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extender vista de búsqueda de res.partner -->
+    <record id="view_partner_search_inherit_customer_type" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit.customer.type</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='type_person']" position="after">
+                <separator/>
+                <filter string="Minorista" name="minorista" domain="[('customer_type', '=', 'minorista')]"/>
+                <filter string="Mayorista" name="mayorista" domain="[('customer_type', '=', 'mayorista')]"/>
+                <filter string="VIP" name="vip" domain="[('customer_type', '=', 'vip')]"/>
+                <filter string="Sin Tipo" name="sin_tipo" domain="[('customer_type', '=', 'none')]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Tipo de Cliente" name="group_customer_type" context="{'group_by': 'customer_type'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

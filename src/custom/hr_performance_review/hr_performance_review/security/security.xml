@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Categoría de Evaluaciones de Desempeño -->
+        <record id="module_category_hr_performance" model="ir.module.category">
+            <field name="name">Evaluaciones de Desempeño</field>
+            <field name="description">Permisos para gestionar evaluaciones de desempeño de empleados</field>
+            <field name="sequence">25</field>
+        </record>
+
+        <!-- Grupo para usuarios que pueden ver evaluaciones -->
+        <record id="group_hr_performance_user" model="res.groups">
+            <field name="name">Usuario / Evaluaciones de Desempeño</field>
+            <field name="category_id" ref="module_category_hr_performance"/>
+            <field name="implied_ids" eval="[(4, ref('hr.group_hr_user'))]"/>
+            <field name="comment">Puede ver y crear evaluaciones de desempeño</field>
+        </record>
+
+        <!-- Grupo para managers que pueden gestionar todas las evaluaciones -->
+        <record id="group_hr_performance_manager" model="res.groups">
+            <field name="name">Manager / Evaluaciones de Desempeño</field>
+            <field name="category_id" ref="module_category_hr_performance"/>
+            <field name="implied_ids" eval="[(4, ref('group_hr_performance_user'))]"/>
+            <field name="comment">Puede gestionar todas las evaluaciones de desempeño</field>
+        </record>
+    </data>
+    
+    <data noupdate="1">
+        <!-- Regla de registro: Usuarios de HR Manager ven todas las evaluaciones -->
+        <record id="hr_performance_review_rule_hr_manager" model="ir.rule">
+            <field name="name">Evaluaciones: HR Manager ve todo</field>
+            <field name="model_id" ref="model_hr_performance_review"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        
+        <!-- Regla de registro: Usuarios de HR User ven evaluaciones de su departamento -->
+        <record id="hr_performance_review_rule_hr_user" model="ir.rule">
+            <field name="name">Evaluaciones: HR User ve propias y departamento</field>
+            <field name="model_id" ref="model_hr_performance_review"/>
+            <field name="domain_force">[
+                '|', '|',
+                ('reviewer_id.user_id', '=', user.id),
+                ('department_id.manager_id.user_id', '=', user.id),
+                ('employee_id.user_id', '=', user.id)
+            ]</field>
+            <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Regla de registro: Usuarios del grupo performance_user -->
+        <record id="hr_performance_review_rule_user" model="ir.rule">
+            <field name="name">Evaluaciones: ver propias y del departamento</field>
+            <field name="model_id" ref="model_hr_performance_review"/>
+            <field name="domain_force">[
+                '|', '|',
+                ('reviewer_id.user_id', '=', user.id),
+                ('department_id.manager_id.user_id', '=', user.id),
+                ('employee_id.user_id', '=', user.id)
+            ]</field>
+            <field name="groups" eval="[(4, ref('group_hr_performance_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Regla de registro: Managers de performance ven todas las evaluaciones -->
+        <record id="hr_performance_review_rule_manager" model="ir.rule">
+            <field name="name">Evaluaciones: managers ven todo</field>
+            <field name="model_id" ref="model_hr_performance_review"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_hr_performance_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Secuencia para evaluaciones de desempeño -->
+        <record id="seq_hr_performance_review" model="ir.sequence">
+            <field name="name">Evaluación de Desempeño</field>
+            <field name="code">hr.performance.review</field>
+            <field name="prefix">EVAL/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>
+

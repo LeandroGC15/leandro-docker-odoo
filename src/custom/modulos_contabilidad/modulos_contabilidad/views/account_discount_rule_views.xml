@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista tree para account.discount.rule -->
+    <record id="account_discount_rule_tree_view" model="ir.ui.view">
+        <field name="name">account.discount.rule.tree</field>
+        <field name="model">account.discount.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Reglas de Descuento" decoration-muted="active == False">
+                <field name="customer_type"/>
+                <field name="name"/>
+                <field name="discount_percentage" widget="percentage"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista formulario para account.discount.rule -->
+    <record id="account_discount_rule_form_view" model="ir.ui.view">
+        <field name="name">account.discount.rule.form</field>
+        <field name="model">account.discount.rule</field>
+        <field name="arch" type="xml">
+            <form string="Regla de Descuento">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_type" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="name" placeholder="Ej: Descuento Mayorista 10%"/>
+                            <field name="discount_percentage" widget="percentage"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                            <field name="is_default" readonly="1" invisible="not is_default"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Información">
+                        <p class="text-muted">
+                            Selecciona el tipo de cliente y el porcentaje de descuento.
+                            Esta regla se aplicará automáticamente a los contactos 
+                            con este tipo de cliente en las facturas de venta.
+                        </p>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista búsqueda -->
+    <record id="account_discount_rule_search_view" model="ir.ui.view">
+        <field name="name">account.discount.rule.search</field>
+        <field name="model">account.discount.rule</field>
+        <field name="arch" type="xml">
+            <search string="Reglas de Descuento">
+                <field name="name"/>
+                <field name="customer_type"/>
+                <filter string="Activas" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactivas" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Minorista" name="minorista" domain="[('customer_type', '=', 'minorista')]"/>
+                <filter string="Mayorista" name="mayorista" domain="[('customer_type', '=', 'mayorista')]"/>
+                <filter string="VIP" name="vip" domain="[('customer_type', '=', 'vip')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Tipo de Cliente" name="group_customer_type" context="{'group_by': 'customer_type'}"/>
+                    <filter string="Compañía" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción -->
+    <record id="account_discount_rule_action" model="ir.actions.act_window">
+        <field name="name">Reglas de Descuento</field>
+        <field name="res_model">account.discount.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_default', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primera regla de descuento
+            </p>
+            <p>
+                Las reglas de descuento se asignan a los contactos como "Tipo de Cliente"
+                y el descuento se aplica automáticamente en las facturas de venta.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú principal -->
+    <menuitem id="modulos_contabilidad_menu_root"
+              name="Módulos Contabilidad"
+              sequence="100"/>
+
+    <!-- Submenú Reglas de Descuento -->
+    <menuitem id="account_discount_rule_menu_main"
+              name="Reglas de Descuento"
+              parent="modulos_contabilidad_menu_root"
+              action="account_discount_rule_action"
+              sequence="10"/>
+</odoo>

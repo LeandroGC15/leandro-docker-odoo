@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plantilla para reporte de evaluación individual -->
+    <template id="report_performance_review_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center mb-4">
+                            Evaluación de Desempeño
+                        </h2>
+                        <h4 class="text-center text-muted mb-4">
+                            <t t-esc="doc.name"/>
+                        </h4>
+
+                        <!-- Información General -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Empleado:</td>
+                                        <td><t t-esc="doc.employee_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Departamento:</td>
+                                        <td><t t-esc="doc.department_id.name or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Puesto:</td>
+                                        <td><t t-esc="doc.job_id.name or '-'"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Evaluador:</td>
+                                        <td><t t-esc="doc.reviewer_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Fecha:</td>
+                                        <td><t t-esc="doc.review_date" t-options="{'widget': 'date'}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Estado:</td>
+                                        <td>
+                                            <span t-if="doc.state == 'draft'" class="badge bg-secondary">Borrador</span>
+                                            <span t-if="doc.state == 'in_progress'" class="badge bg-warning">En Progreso</span>
+                                            <span t-if="doc.state == 'done'" class="badge bg-success">Completada</span>
+                                            <span t-if="doc.state == 'cancel'" class="badge bg-danger">Cancelada</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Calificación -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Calificación General</strong>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <h1 class="display-4">
+                                            <t t-esc="'%.1f' % doc.score"/> / 10
+                                        </h1>
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar" 
+                                                 role="progressbar" 
+                                                 t-attf-style="width: #{doc.score * 10}%;"
+                                                 t-attf-class="#{doc.score >= 7 and 'bg-success' or doc.score >= 5 and 'bg-warning' or 'bg-danger'}">
+                                                <t t-esc="'%.0f' % (doc.score * 10)"/>%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="row mb-3" t-if="doc.comments">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <strong>Observaciones</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <p t-esc="doc.comments"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fortalezas y Debilidades -->
+                        <div class="row mb-3">
+                            <div class="col-6" t-if="doc.strengths">
+                                <div class="card h-100">
+                                    <div class="card-header bg-success text-white">
+                                        <strong>Fortalezas</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <p t-esc="doc.strengths"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6" t-if="doc.weaknesses">
+                                <div class="card h-100">
+                                    <div class="card-header bg-warning">
+                                        <strong>Áreas de Mejora</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <p t-esc="doc.weaknesses"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Objetivos -->
+                        <div class="row mb-3" t-if="doc.goals_next_period">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <strong>Objetivos para el Siguiente Período</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <p t-esc="doc.goals_next_period"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Firmas -->
+                        <div class="row mt-5">
+                            <div class="col-6 text-center">
+                                <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 10px;">
+                                    <strong>Firma del Evaluador</strong>
+                                    <br/>
+                                    <span t-esc="doc.reviewer_id.name"/>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto; padding-top: 10px;">
+                                    <strong>Firma del Empleado</strong>
+                                    <br/>
+                                    <span t-esc="doc.employee_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Plantilla para reporte histórico del empleado -->
+    <template id="report_employee_performance_history_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="text-center mb-4">
+                            Histórico de Evaluaciones de Desempeño
+                        </h2>
+
+                        <!-- Información del Empleado -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Empleado:</td>
+                                        <td><t t-esc="doc.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Departamento:</td>
+                                        <td><t t-esc="doc.department_id.name or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Puesto:</td>
+                                        <td><t t-esc="doc.job_id.name or '-'"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 50%;">Total Evaluaciones:</td>
+                                        <td><t t-esc="doc.performance_review_count"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Última Evaluación:</td>
+                                        <td><t t-esc="doc.last_review_date" t-options="{'widget': 'date'}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Promedio General:</td>
+                                        <td><t t-esc="'%.1f' % doc.average_score"/> / 10</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Resumen Gráfico -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Promedio de Calificación</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="progress" style="height: 30px;">
+                                            <div class="progress-bar" 
+                                                 role="progressbar" 
+                                                 t-attf-style="width: #{doc.average_score * 10}%;"
+                                                 t-attf-class="#{doc.average_score >= 7 and 'bg-success' or doc.average_score >= 5 and 'bg-warning' or 'bg-danger'}">
+                                                <t t-esc="'%.1f' % doc.average_score"/> / 10
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla de Evaluaciones -->
+                        <t t-set="completed_reviews" t-value="doc.performance_review_ids.filtered(lambda r: r.state == 'done').sorted('review_date', reverse=True)"/>
+                        <t t-if="completed_reviews">
+                            <h4 class="mb-3">Historial de Evaluaciones Completadas</h4>
+                            <table class="table table-striped table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Referencia</th>
+                                        <th>Fecha</th>
+                                        <th>Evaluador</th>
+                                        <th class="text-center">Calificación</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="completed_reviews" t-as="review">
+                                        <tr>
+                                            <td><t t-esc="review.name"/></td>
+                                            <td><t t-esc="review.review_date" t-options="{'widget': 'date'}"/></td>
+                                            <td><t t-esc="review.reviewer_id.name"/></td>
+                                            <td class="text-center">
+                                                <span t-attf-class="badge #{review.score >= 7 and 'bg-success' or review.score >= 5 and 'bg-warning' or 'bg-danger'}">
+                                                    <t t-esc="'%.1f' % review.score"/> / 10
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <t t-if="review.comments">
+                                                    <t t-esc="review.comments[:100]"/>
+                                                    <t t-if="len(review.comments or '') > 100">...</t>
+                                                </t>
+                                                <t t-else="">-</t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <!-- Detalle de cada evaluación -->
+                            <div class="page-break-before" t-foreach="completed_reviews" t-as="review">
+                                <h4 class="mt-4 mb-3">
+                                    Detalle: <t t-esc="review.name"/> - <t t-esc="review.review_date" t-options="{'widget': 'date'}"/>
+                                </h4>
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <strong>Evaluador:</strong> <t t-esc="review.reviewer_id.name"/>
+                                        <span class="ms-4">
+                                            <strong>Calificación:</strong> 
+                                            <span t-attf-class="badge #{review.score >= 7 and 'bg-success' or review.score >= 5 and 'bg-warning' or 'bg-danger'}">
+                                                <t t-esc="'%.1f' % review.score"/> / 10
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row" t-if="review.comments">
+                                    <div class="col-12 mb-2">
+                                        <strong>Observaciones:</strong>
+                                        <p class="ms-3"><t t-esc="review.comments"/></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6" t-if="review.strengths">
+                                        <strong>Fortalezas:</strong>
+                                        <p class="ms-3"><t t-esc="review.strengths"/></p>
+                                    </div>
+                                    <div class="col-6" t-if="review.weaknesses">
+                                        <strong>Áreas de Mejora:</strong>
+                                        <p class="ms-3"><t t-esc="review.weaknesses"/></p>
+                                    </div>
+                                </div>
+                                <div class="row" t-if="review.goals_next_period">
+                                    <div class="col-12">
+                                        <strong>Objetivos para el Siguiente Período:</strong>
+                                        <p class="ms-3"><t t-esc="review.goals_next_period"/></p>
+                                    </div>
+                                </div>
+                                <hr/>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-info">
+                                Este empleado no tiene evaluaciones completadas.
+                            </div>
+                        </t>
+
+                        <!-- Fecha de generación -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-end text-muted">
+                                <small>Reporte generado el: <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></small>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+

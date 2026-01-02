@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_cross_sell_user,product.cross.sell.user,model_product_cross_sell,group_cross_sell_user,1,0,0,0
+access_product_cross_sell_manager,product.cross.sell.manager,model_product_cross_sell,group_cross_sell_manager,1,1,1,1
+access_product_cross_sell_sale_user,product.cross.sell.sale.user,model_product_cross_sell,sales_team.group_sale_salesman,1,0,0,0
+access_product_cross_sell_sale_manager,product.cross.sell.sale.manager,model_product_cross_sell,sales_team.group_sale_manager,1,1,1,1
+access_cross_sell_wizard_user,cross.sell.wizard.user,model_cross_sell_wizard,sales_team.group_sale_salesman,1,1,1,1
+access_cross_sell_wizard_line_user,cross.sell.wizard.line.user,model_cross_sell_wizard_line,sales_team.group_sale_salesman,1,1,1,1
+

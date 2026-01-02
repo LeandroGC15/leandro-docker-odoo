@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_stock_critical_alert_user,stock.critical.alert.user,model_stock_critical_alert,group_stock_alert_user,1,0,0,0
+access_stock_critical_alert_manager,stock.critical.alert.manager,model_stock_critical_alert,group_stock_alert_manager,1,1,1,1
+access_stock_critical_alert_stock_user,stock.critical.alert.stock.user,model_stock_critical_alert,stock.group_stock_user,1,0,0,0
+access_stock_critical_alert_stock_manager,stock.critical.alert.stock.manager,model_stock_critical_alert,stock.group_stock_manager,1,1,1,1
+

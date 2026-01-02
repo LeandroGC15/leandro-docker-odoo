@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Heredar la vista de formulario de product.template -->
+    <record id="product_template_form_view_stock_alert" model="ir.ui.view">
+        <field name="name">product.template.form.stock.alert</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
+        <field name="arch" type="xml">
+            <!-- Agregar campo de stock mínimo en la pestaña de inventario -->
+            <xpath expr="//group[@name='group_lots_and_weight']" position="after">
+                <group name="stock_alert_settings" string="Alertas de Stock">
+                    <field name="stock_minimum" 
+                           widget="float" 
+                           options="{'digits': [16, 2]}"/>
+                    <field name="is_stock_critical" 
+                           readonly="1"
+                           widget="boolean_toggle"/>
+                </group>
+            </xpath>
+            
+            <!-- Agregar botón para ver alertas en el button_box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="stock_alert_count" invisible="1"/>
+                <button class="oe_stat_button" 
+                        type="object"
+                        name="action_view_stock_alerts" 
+                        icon="fa-exclamation-triangle"
+                        invisible="stock_alert_count == 0">
+                    <field string="Alertas" name="stock_alert_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vista de lista para productos con stock crítico -->
+    <record id="product_template_tree_view_stock_critical" model="ir.ui.view">
+        <field name="name">product.template.tree.stock.critical</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <tree string="Productos con Stock Crítico" 
+                  decoration-danger="is_stock_critical == True"
+                  >
+                <field name="name"/>
+                <field name="categ_id"/>
+                <field name="qty_available" string="Stock Actual"/>
+                <field name="stock_minimum" string="Stock Mínimo"/>
+                <field name="is_stock_critical" string="Crítico" widget="boolean"/>
+                <field name="stock_alert_count" string="Alertas"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para productos con stock crítico -->
+    <record id="product_template_search_view_stock_critical" model="ir.ui.view">
+        <field name="name">product.template.search.stock.critical</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Productos">
+                <field name="name"/>
+                <field name="categ_id"/>
+                <filter string="Stock Crítico" 
+                        name="filter_critical" 
+                        domain="[('is_stock_critical', '=', True)]"/>
+                <filter string="Con Stock Mínimo" 
+                        name="filter_has_minimum" 
+                        domain="[('stock_minimum', '>', 0)]"/>
+                <separator/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Categoría" 
+                            name="group_category" 
+                            context="{'group_by': 'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción para ver productos con stock crítico -->
+    <record id="action_product_stock_critical" model="ir.actions.act_window">
+        <field name="name">Productos con Stock Crítico</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="product_template_tree_view_stock_critical"/>
+        <field name="search_view_id" ref="product_template_search_view_stock_critical"/>
+        <field name="domain">[('is_stock_critical', '=', True)]</field>
+        <field name="context">{
+            'search_default_filter_critical': 1,
+            'search_default_group_category': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                ¡Excelente! No hay productos con stock crítico
+            </p>
+            <p>
+                Aquí aparecerán los productos cuyo stock disponible sea menor al stock mínimo configurado.
+            </p>
+        </field>
+    </record>
+</odoo>
+

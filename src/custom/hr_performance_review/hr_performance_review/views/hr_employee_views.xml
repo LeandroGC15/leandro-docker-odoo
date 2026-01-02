@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extensión de la vista formulario de empleado -->
+    <record id="hr_employee_form_view_inherit_performance" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.performance</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_performance_reviews"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-star">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="performance_review_count"/>
+                        </span>
+                        <span class="o_stat_text">Evaluaciones</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Evaluaciones de Desempeño" name="performance_reviews">
+                    <div class="oe_button_box" name="button_box_evaluations">
+                        <button name="action_print_performance_history"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-file-pdf-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Imprimir Histórico</span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group string="Resumen de Evaluaciones">
+                            <field name="last_review_date" readonly="1"/>
+                            <field name="last_review_score" readonly="1"/>
+                            <field name="average_score_percentage" readonly="1" widget="progressbar" 
+                                   string="Promedio de Calificación"/>
+                        </group>
+                    </group>
+                    <field name="performance_review_ids" readonly="1">
+                        <tree string="Historial de Evaluaciones" 
+                              decoration-success="state == 'done'"
+                              decoration-info="state == 'draft'"
+                              decoration-warning="state == 'in_progress'"
+                              decoration-danger="state == 'cancel'">
+                            <field name="name"/>
+                            <field name="review_date"/>
+                            <field name="reviewer_id"/>
+                            <field name="score_percentage" widget="progressbar" string="Calificación"/>
+                            <field name="state" widget="badge" 
+                                   decoration-info="state == 'draft'"
+                                   decoration-warning="state == 'in_progress'"
+                                   decoration-success="state == 'done'"
+                                   decoration-danger="state == 'cancel'"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extensión de la vista tree de empleado para mostrar última evaluación -->
+    <record id="hr_employee_tree_view_inherit_performance" model="ir.ui.view">
+        <field name="name">hr.employee.tree.inherit.performance</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="last_review_date" optional="hide"/>
+                <field name="last_review_score" optional="hide"/>
+                <field name="average_score_percentage" optional="hide" widget="progressbar" string="Promedio"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

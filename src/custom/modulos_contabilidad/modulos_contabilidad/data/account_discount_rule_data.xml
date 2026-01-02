@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Regla por defecto: Sin tipo (se usa para contactos nuevos) -->
+        <record id="discount_rule_sin_tipo" model="account.discount.rule">
+            <field name="name">Sin tipo de cliente</field>
+            <field name="customer_type">none</field>
+            <field name="discount_percentage">0.0</field>
+            <field name="active">True</field>
+            <field name="is_default">True</field>
+        </record>
+
+        <!-- Regla para clientes Minoristas: 5% de descuento -->
+        <record id="discount_rule_minorista" model="account.discount.rule">
+            <field name="name">Descuento Minorista 5%</field>
+            <field name="customer_type">minorista</field>
+            <field name="discount_percentage">5.0</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Regla para clientes Mayoristas: 10% de descuento -->
+        <record id="discount_rule_mayorista" model="account.discount.rule">
+            <field name="name">Descuento Mayorista 10%</field>
+            <field name="customer_type">mayorista</field>
+            <field name="discount_percentage">10.0</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Regla para clientes VIP: 15% de descuento -->
+        <record id="discount_rule_vip" model="account.discount.rule">
+            <field name="name">Descuento VIP 15%</field>
+            <field name="customer_type">vip</field>
+            <field name="discount_percentage">15.0</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

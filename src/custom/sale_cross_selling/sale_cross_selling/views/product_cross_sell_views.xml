@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Kanban para reglas de cross-selling -->
+    <record id="product_cross_sell_kanban_view" model="ir.ui.view">
+        <field name="name">product.cross.sell.kanban</field>
+        <field name="model">product.cross.sell</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="id"/>
+                <field name="source_product_tmpl_id"/>
+                <field name="suggested_product_tmpl_id"/>
+                <field name="bidirectional"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{record.active.raw_value ? '' : 'o_kanban_card_muted'}">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="source_product_tmpl_id"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="text-center my-2">
+                                        <span t-if="record.bidirectional.raw_value" 
+                                              class="badge rounded-pill text-bg-primary">
+                                            <i class="fa fa-exchange"/> Bidireccional
+                                        </span>
+                                        <span t-else="" class="text-muted" title="Unidireccional">
+                                            <i class="fa fa-arrow-right"/>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <strong>Sugiere:</strong>
+                                        <field name="suggested_product_tmpl_id"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span t-if="!record.active.raw_value" 
+                                              class="badge rounded-pill text-bg-secondary">
+                                            Inactiva
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Vista Tree para reglas de cross-selling -->
+    <record id="product_cross_sell_tree_view" model="ir.ui.view">
+        <field name="name">product.cross.sell.tree</field>
+        <field name="model">product.cross.sell</field>
+        <field name="arch" type="xml">
+            <tree string="Reglas de Cross-Selling" 
+                  decoration-muted="active == False">
+                <field name="sequence" widget="handle"/>
+                <field name="source_product_tmpl_id"/>
+                <field name="suggested_product_tmpl_id"/>
+                <field name="bidirectional" widget="boolean_toggle"/>
+                <field name="description" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista Formulario para reglas de cross-selling -->
+    <record id="product_cross_sell_form_view" model="ir.ui.view">
+        <field name="name">product.cross.sell.form</field>
+        <field name="model">product.cross.sell</field>
+        <field name="arch" type="xml">
+            <form string="Regla de Cross-Selling">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <widget name="web_ribbon" title="Inactiva" bg_color="text-bg-secondary"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1" placeholder="Nueva Regla"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Producto Origen">
+                            <field name="source_product_tmpl_id" 
+                                   options="{'no_create': True}"
+                                   placeholder="Seleccione el producto que dispara la sugerencia"/>
+                        </group>
+                        <group string="Producto Sugerido">
+                            <field name="suggested_product_tmpl_id" 
+                                   options="{'no_create': True}"
+                                   placeholder="Seleccione el producto a sugerir"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Opciones">
+                            <field name="bidirectional"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Compañía" groups="base.group_multi_company">
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                    <group string="Descripción">
+                        <field name="description" 
+                               placeholder="Describa por qué estos productos son complementarios..."
+                               nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Información">
+                        <p class="text-muted">
+                            <i class="fa fa-info-circle"/> 
+                            Cuando un cliente añada el <strong>producto origen</strong> a un pedido de venta,
+                            el sistema sugerirá automáticamente el <strong>producto sugerido</strong> como complementario.
+                            <br/><br/>
+                            Si marca <strong>Bidireccional</strong>, la sugerencia funcionará en ambos sentidos.
+                        </p>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda -->
+    <record id="product_cross_sell_search_view" model="ir.ui.view">
+        <field name="name">product.cross.sell.search</field>
+        <field name="model">product.cross.sell</field>
+        <field name="arch" type="xml">
+            <search string="Reglas de Cross-Selling">
+                <field name="source_product_tmpl_id"/>
+                <field name="suggested_product_tmpl_id"/>
+                <field name="description"/>
+                <separator/>
+                <filter string="Activas" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactivas" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Bidireccionales" name="bidirectional" domain="[('bidirectional', '=', True)]"/>
+                <filter string="Unidireccionales" name="unidirectional" domain="[('bidirectional', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Producto Origen" name="group_source" 
+                            context="{'group_by': 'source_product_tmpl_id'}"/>
+                    <filter string="Producto Sugerido" name="group_suggested" 
+                            context="{'group_by': 'suggested_product_tmpl_id'}"/>
+                    <filter string="Compañía" name="group_company" 
+                            context="{'group_by': 'company_id'}" 
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción principal -->
+    <record id="product_cross_sell_action" model="ir.actions.act_window">
+        <field name="name">Reglas de Cross-Selling</field>
+        <field name="res_model">product.cross.sell</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primera regla de cross-selling
+            </p>
+            <p>
+                Las reglas de cross-selling permiten sugerir productos complementarios
+                automáticamente cuando se añaden productos a un pedido de venta.
+            </p>
+            <p>
+                <strong>Ejemplo:</strong> Si vendes laptops, puedes sugerir fundas, 
+                ratones o cables de alimentación como productos complementarios.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú principal bajo Ventas > Configuración -->
+    <menuitem id="sale_cross_selling_menu_config"
+              name="Cross-Selling"
+              parent="sale.menu_sale_config"
+              action="product_cross_sell_action"
+              sequence="90"
+              groups="sales_team.group_sale_manager"/>
+
+    <!-- Menú alternativo en catálogo de productos -->
+    <menuitem id="sale_cross_selling_menu_products"
+              name="Reglas de Cross-Selling"
+              parent="sale.product_menu_catalog"
+              action="product_cross_sell_action"
+              sequence="30"
+              groups="sales_team.group_sale_manager"/>
+</odoo>
+

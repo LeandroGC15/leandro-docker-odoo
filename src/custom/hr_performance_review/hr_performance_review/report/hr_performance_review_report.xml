@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Acción de reporte para evaluación individual -->
+    <record id="action_report_performance_review" model="ir.actions.report">
+        <field name="name">Reporte de Evaluación de Desempeño</field>
+        <field name="model">hr.performance.review</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hr_performance_review.report_performance_review_template</field>
+        <field name="report_file">hr_performance_review.report_performance_review_template</field>
+        <field name="print_report_name">'Evaluacion_%s_%s' % (object.employee_id.name, object.name)</field>
+        <field name="binding_model_id" ref="model_hr_performance_review"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Acción de reporte para histórico del empleado -->
+    <record id="action_report_employee_performance_history" model="ir.actions.report">
+        <field name="name">Histórico de Evaluaciones del Empleado</field>
+        <field name="model">hr.employee</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hr_performance_review.report_employee_performance_history_template</field>
+        <field name="report_file">hr_performance_review.report_employee_performance_history_template</field>
+        <field name="print_report_name">'Historico_Evaluaciones_%s' % (object.name)</field>
+        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
+
