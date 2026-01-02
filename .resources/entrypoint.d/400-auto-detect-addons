@@ -26,11 +26,41 @@ repo_addons = []
 
 # Custom repositories, usually mounted for development
 if os.path.isdir(CUSTOM):
-    repo_addons += [
-        os.path.join(CUSTOM, d)
-        for d in sorted(os.listdir(CUSTOM))
-        if os.path.isdir(os.path.join(CUSTOM, d))
-    ]
+    for d in sorted(os.listdir(CUSTOM)):
+        repo_path = os.path.join(CUSTOM, d)
+        if os.path.isdir(repo_path):
+            # Check if there's a __manifest__.py in the root (direct module)
+            manifest_root = os.path.join(repo_path, "__manifest__.py")
+            # Check if there's a subdirectory with the same name (nested module)
+            subdir_path = os.path.join(repo_path, d)
+            manifest_subdir = os.path.join(subdir_path, "__manifest__.py")
+            
+            print(f"DEBUG: Checking {d}")
+            print(f"DEBUG: manifest_root={manifest_root}, exists={os.path.exists(manifest_root)}")
+            print(f"DEBUG: subdir_path={subdir_path}, manifest_subdir={manifest_subdir}, exists={os.path.exists(manifest_subdir)}")
+            
+            if os.path.exists(manifest_root):
+                # Direct module structure: the folder itself is a module
+                # We need to add the PARENT directory to addons_path
+                parent_path = os.path.dirname(repo_path)
+                _logger.debug(f"Found direct module at {repo_path}, adding parent: {parent_path}")
+                print(f"DEBUG: Adding parent of direct module: {parent_path}")
+                if parent_path not in repo_addons:
+                    repo_addons.append(parent_path)
+            elif os.path.exists(manifest_subdir):
+                # Nested module structure (repo/module_name/module_name/)
+                # repo_path contains a module named 'd', so add repo_path to addons_path
+                _logger.debug(f"Found nested module {d} at {subdir_path}, adding container: {repo_path}")
+                print(f"DEBUG: Adding container of nested module: {repo_path}")
+                if repo_path not in repo_addons:
+                    repo_addons.append(repo_path)
+            else:
+                # Default: add the repo path (for backward compatibility)
+                # This handles directories that contain multiple modules
+                _logger.debug(f"Using default path {repo_path}")
+                print(f"DEBUG: Adding default path: {repo_path}")
+                if repo_path not in repo_addons:
+                    repo_addons.append(repo_path)
 
     for d in sorted(os.listdir(CUSTOM)):
         module_path = os.path.join(CUSTOM, d)
