@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extensión de la vista formulario de pos.session -->
+    <record id="view_pos_session_form_loyalty" model="ir.ui.view">
+        <field name="name">pos.session.form.loyalty</field>
+        <field name="model">pos.session</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_session_form"/>
+        <field name="arch" type="xml">
+            <!-- Añadir campos de fidelización después del grupo principal -->
+            <xpath expr="//group[last()]" position="after">
+                <group string="Resumen de Fidelización" 
+                       invisible="loyalty_points_earned == 0 and loyalty_transactions_count == 0">
+                    <field name="loyalty_points_earned"/>
+                    <field name="loyalty_transactions_count"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extensión de la vista lista de pos.session -->
+    <record id="view_pos_session_tree_loyalty" model="ir.ui.view">
+        <field name="name">pos.session.tree.loyalty</field>
+        <field name="model">pos.session</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_session_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="loyalty_points_earned" string="Puntos Ganados" optional="hide"/>
+                <field name="loyalty_transactions_count" string="Trans. Fidelización" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

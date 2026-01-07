@@ -13,6 +13,7 @@ class TestAccountMoveDiscount(TransactionCase):
         self.product_model = self.env['product.product']
         self.move_model = self.env['account.move']
         self.rule_model = self.env['account.discount.rule']
+        self.company = self.env.company
 
         # Crear productos de prueba
         self.product = self.product_model.create({
@@ -21,31 +22,32 @@ class TestAccountMoveDiscount(TransactionCase):
             'list_price': 100.0,
         })
 
-        # Crear reglas de descuento
-        self.rule_minorista = self.rule_model.create({
-            'name': 'Descuento Minorista 5%',
-            'customer_type': 'minorista',
-            'discount_percentage': 5.0,
-            'active': True,
-        })
-        self.rule_mayorista = self.rule_model.create({
-            'name': 'Descuento Mayorista 10%',
-            'customer_type': 'mayorista',
-            'discount_percentage': 10.0,
-            'active': True,
-        })
-        self.rule_vip = self.rule_model.create({
-            'name': 'Descuento VIP 15%',
-            'customer_type': 'vip',
-            'discount_percentage': 15.0,
-            'active': True,
-        })
-        self.rule_none = self.rule_model.create({
-            'name': 'Sin tipo',
-            'customer_type': 'none',
-            'discount_percentage': 0.0,
-            'active': True,
-        })
+        # Buscar o crear reglas de descuento
+        self.rule_minorista = self._get_or_create_rule('minorista', 5.0)
+        self.rule_mayorista = self._get_or_create_rule('mayorista', 10.0)
+        self.rule_vip = self._get_or_create_rule('vip', 15.0)
+        self.rule_none = self._get_or_create_rule('none', 0.0)
+
+    def _get_or_create_rule(self, customer_type, percentage):
+        """Helper para obtener regla existente o crear nueva"""
+        rule = self.rule_model.search([
+            ('customer_type', '=', customer_type),
+            ('company_id', '=', self.company.id),
+            ('active', '=', True)
+        ], limit=1)
+        
+        if not rule:
+            rule = self.rule_model.create({
+                'name': f'Test Rule {customer_type}',
+                'customer_type': customer_type,
+                'discount_percentage': percentage,
+                'active': True,
+            })
+        elif rule.discount_percentage != percentage:
+            # Asegurar que el porcentaje sea el esperado para el test
+            rule.discount_percentage = percentage
+            
+        return rule
 
     def test_invoice_auto_discount_mayorista(self):
         """Test 3: Aplicación automática de descuento para mayorista"""

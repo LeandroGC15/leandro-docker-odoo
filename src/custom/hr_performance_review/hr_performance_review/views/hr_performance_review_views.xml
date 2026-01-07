@@ -52,7 +52,7 @@
                                     </div>
                                     <div class="oe_kanban_bottom_right">
                                         <span class="badge rounded-pill text-bg-info">
-                                            <i class="fa fa-star"/> <field name="score"/>
+                                            <i class="fa fa-star" title="Calificación"/> <field name="score"/>
                                         </span>
                                     </div>
                                 </div>

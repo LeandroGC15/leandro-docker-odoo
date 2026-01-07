@@ -202,14 +202,20 @@ class TestSaleOrderCrossSell(TransactionCase):
         """Test: No se pueden añadir productos a pedido confirmado"""
         order = self._create_sale_order([self.product_laptop])
         
-        # Confirmar pedido
-        order.action_confirm()
-        
-        # Intentar abrir wizard en pedido confirmado
+        # Abrir wizard ANTES de confirmar (para tenerlo disponible)
         result = order.action_show_cross_sell_wizard()
+        wizard = self.wizard_model.browse(result['res_id'])
         
-        # Debería devolver notificación o el wizard no permite añadir
-        # (dependiendo del estado del pedido)
+        # Seleccionar un producto
+        wizard.action_select_all()
+        
+        # Confirmar el pedido DESPUÉS de crear el wizard
+        order.action_confirm()
+        self.assertEqual(order.state, 'sale')
+        
+        # Intentar añadir productos al pedido confirmado debe lanzar UserError
+        with self.assertRaises(UserError):
+            wizard.action_add_selected_products()
 
     def test_12_order_update_after_adding_products(self):
         """Test: El pedido se actualiza correctamente después de añadir"""

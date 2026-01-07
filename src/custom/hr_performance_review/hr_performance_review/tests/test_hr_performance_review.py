@@ -268,3 +268,81 @@ class TestHrPerformanceReview(TransactionCase):
         self.assertEqual(action['res_model'], 'hr.performance.review')
         self.assertIn(('employee_id', '=', self.employee1.id), action['domain'])
 
+    def test_14_score_percentage_computed(self):
+        """Test: Cálculo de porcentaje de calificación"""
+        review = self.review_model.create({
+            'employee_id': self.employee1.id,
+            'reviewer_id': self.employee2.id,
+            'review_date': date.today(),
+            'score': 8.5,
+        })
+        
+        # score_percentage = (score / 10) * 100 = (8.5 / 10) * 100 = 85%
+        self.assertEqual(review.score_percentage, 85.0)
+        
+        # Verificar con score 0
+        review2 = self.review_model.create({
+            'employee_id': self.employee1.id,
+            'reviewer_id': self.employee3.id,
+            'review_date': date.today(),
+            'score': 0.0,
+        })
+        self.assertEqual(review2.score_percentage, 0.0)
+        
+        # Verificar con score máximo
+        review3 = self.review_model.create({
+            'employee_id': self.employee3.id,
+            'reviewer_id': self.employee2.id,
+            'review_date': date.today(),
+            'score': 10.0,
+        })
+        self.assertEqual(review3.score_percentage, 100.0)
+
+    def test_15_average_score_percentage_computed(self):
+        """Test: Cálculo del porcentaje promedio del empleado"""
+        # Crear evaluaciones completadas
+        review1 = self.review_model.create({
+            'employee_id': self.employee1.id,
+            'reviewer_id': self.employee2.id,
+            'review_date': date.today(),
+            'score': 6.0,
+        })
+        review1.action_start_review()
+        review1.action_complete_review()
+        
+        review2 = self.review_model.create({
+            'employee_id': self.employee1.id,
+            'reviewer_id': self.employee3.id,
+            'review_date': date.today(),
+            'score': 8.0,
+        })
+        review2.action_start_review()
+        review2.action_complete_review()
+        
+        # Promedio = (6 + 8) / 2 = 7
+        # Porcentaje = (7 / 10) * 100 = 70%
+        self.assertEqual(self.employee1.average_score, 7.0)
+        self.assertEqual(self.employee1.average_score_percentage, 70.0)
+
+    def test_16_job_relation(self):
+        """Test: Relación con puesto de trabajo a través del empleado"""
+        # Crear un puesto de trabajo
+        job = self.env['hr.job'].create({
+            'name': 'Desarrollador de Prueba',
+        })
+        
+        # Asignar puesto al empleado
+        self.employee1.job_id = job.id
+        
+        # Crear evaluación
+        review = self.review_model.create({
+            'employee_id': self.employee1.id,
+            'reviewer_id': self.employee2.id,
+            'review_date': date.today(),
+            'score': 7.5,
+        })
+        
+        # job_id debería heredarse del empleado
+        self.assertEqual(review.job_id, self.employee1.job_id)
+        self.assertEqual(review.job_id, job)
+

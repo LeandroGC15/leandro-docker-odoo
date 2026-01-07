@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista lista del histórico de puntos -->
+    <record id="view_pos_loyalty_history_tree" model="ir.ui.view">
+        <field name="name">pos.loyalty.history.tree</field>
+        <field name="model">pos.loyalty.history</field>
+        <field name="arch" type="xml">
+            <tree string="Histórico de Fidelización" 
+                  decoration-success="transaction_type == 'earned'"
+                  decoration-danger="transaction_type == 'redeemed'"
+                  decoration-info="transaction_type == 'adjustment'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="transaction_type"/>
+                <field name="points" sum="Total Puntos"/>
+                <field name="balance_after"/>
+                <field name="order_id" optional="show"/>
+                <field name="order_amount" optional="show"/>
+                <field name="description" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista formulario del histórico de puntos -->
+    <record id="view_pos_loyalty_history_form" model="ir.ui.view">
+        <field name="name">pos.loyalty.history.form</field>
+        <field name="model">pos.loyalty.history</field>
+        <field name="arch" type="xml">
+            <form string="Transacción de Fidelización">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Información de la Transacción">
+                            <field name="partner_id"/>
+                            <field name="date"/>
+                            <field name="transaction_type"/>
+                        </group>
+                        <group string="Puntos">
+                            <field name="points"/>
+                            <field name="balance_after"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Orden Relacionada">
+                            <field name="order_id"/>
+                            <field name="order_amount"/>
+                            <field name="session_id"/>
+                        </group>
+                        <group string="Descripción">
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda -->
+    <record id="view_pos_loyalty_history_search" model="ir.ui.view">
+        <field name="name">pos.loyalty.history.search</field>
+        <field name="model">pos.loyalty.history</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Histórico">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="order_id"/>
+                <separator/>
+                <filter name="earned" string="Puntos Ganados" 
+                        domain="[('transaction_type', '=', 'earned')]"/>
+                <filter name="redeemed" string="Puntos Canjeados" 
+                        domain="[('transaction_type', '=', 'redeemed')]"/>
+                <filter name="adjustment" string="Ajustes" 
+                        domain="[('transaction_type', '=', 'adjustment')]"/>
+                <separator/>
+                <filter name="today" string="Hoy" date="date"/>
+                <filter name="this_week" string="Esta Semana" date="date" default_period="this_week"/>
+                <filter name="this_month" string="Este Mes" date="date" default_period="this_month"/>
+                <separator/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_date" string="Fecha" context="{'group_by': 'date:month'}"/>
+                    <filter name="group_type" string="Tipo" context="{'group_by': 'transaction_type'}"/>
+                    <filter name="group_session" string="Sesión" context="{'group_by': 'session_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vista pivot -->
+    <record id="view_pos_loyalty_history_pivot" model="ir.ui.view">
+        <field name="name">pos.loyalty.history.pivot</field>
+        <field name="model">pos.loyalty.history</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Fidelización">
+                <field name="partner_id" type="row"/>
+                <field name="date" type="col" interval="month"/>
+                <field name="points" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vista gráfico -->
+    <record id="view_pos_loyalty_history_graph" model="ir.ui.view">
+        <field name="name">pos.loyalty.history.graph</field>
+        <field name="model">pos.loyalty.history</field>
+        <field name="arch" type="xml">
+            <graph string="Puntos de Fidelización">
+                <field name="date" type="row" interval="month"/>
+                <field name="points" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Acción de ventana -->
+    <record id="action_pos_loyalty_history" model="ir.actions.act_window">
+        <field name="name">Histórico de Fidelización</field>
+        <field name="res_model">pos.loyalty.history</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_pos_loyalty_history_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay transacciones de fidelización
+            </p>
+            <p>
+                Las transacciones de puntos se crean automáticamente cuando un cliente
+                realiza una compra en un Punto de Venta con el programa de fidelización habilitado.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú -->
+    <menuitem id="menu_pos_loyalty_history"
+              name="Histórico de Fidelización"
+              parent="point_of_sale.menu_point_rep"
+              action="action_pos_loyalty_history"
+              sequence="30"/>
+</odoo>
+

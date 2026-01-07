@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extensión de la vista formulario de res.partner -->
+    <record id="view_partner_form_loyalty" model="ir.ui.view">
+        <field name="name">res.partner.form.loyalty</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Smart button para ver histórico de puntos -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_loyalty_history" type="object"
+                        class="oe_stat_button" icon="fa-star"
+                        invisible="loyalty_history_count == 0">
+                    <field name="loyalty_history_count" widget="statinfo" string="Puntos"/>
+                </button>
+            </xpath>
+            
+            <!-- Campos de fidelización en la vista formulario -->
+            <xpath expr="//page[@name='internal_notes']" position="before">
+                <page string="Fidelización" name="loyalty" 
+                      invisible="not is_company and not parent_id">
+                    <group>
+                        <group string="Puntos de Fidelización">
+                            <field name="loyalty_points" readonly="1"/>
+                            <field name="loyalty_points_total_earned" readonly="1"/>
+                            <field name="loyalty_points_total_redeemed" readonly="1"/>
+                        </group>
+                        <group string="Acciones">
+                            <button name="action_view_loyalty_history" type="object"
+                                    string="Ver Histórico de Puntos"
+                                    class="btn-primary"
+                                    icon="fa-history"/>
+                            <button name="action_print_loyalty_report" type="object"
+                                    string="Imprimir Reporte"
+                                    class="btn-secondary"
+                                    icon="fa-print"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extensión de la vista lista de res.partner -->
+    <record id="view_partner_tree_loyalty" model="ir.ui.view">
+        <field name="name">res.partner.tree.loyalty</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='email']" position="after">
+                <field name="loyalty_points" string="Puntos Fidelización" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para filtrar por puntos -->
+    <record id="view_partner_search_loyalty" model="ir.ui.view">
+        <field name="name">res.partner.search.loyalty</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <separator/>
+                <filter name="has_loyalty_points" string="Con Puntos de Fidelización"
+                        domain="[('loyalty_points', '>', 0)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

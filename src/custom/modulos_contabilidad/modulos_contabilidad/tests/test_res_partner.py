@@ -11,32 +11,30 @@ class TestResPartner(TransactionCase):
         super().setUp()
         self.partner_model = self.env['res.partner']
         self.rule_model = self.env['account.discount.rule']
+        self.company = self.env.company
         
-        # Crear reglas de descuento para las pruebas
-        self.rule_minorista = self.rule_model.create({
-            'name': 'Descuento Minorista Test',
-            'customer_type': 'minorista',
-            'discount_percentage': 5.0,
-            'active': True,
-        })
-        self.rule_mayorista = self.rule_model.create({
-            'name': 'Descuento Mayorista Test',
-            'customer_type': 'mayorista',
-            'discount_percentage': 10.0,
-            'active': True,
-        })
-        self.rule_vip = self.rule_model.create({
-            'name': 'Descuento VIP Test',
-            'customer_type': 'vip',
-            'discount_percentage': 15.0,
-            'active': True,
-        })
-        self.rule_none = self.rule_model.create({
-            'name': 'Sin Tipo Test',
-            'customer_type': 'none',
-            'discount_percentage': 0.0,
-            'active': True,
-        })
+        # Buscar o crear reglas de descuento para las pruebas
+        self.rule_minorista = self._get_or_create_rule('minorista', 5.0)
+        self.rule_mayorista = self._get_or_create_rule('mayorista', 10.0)
+        self.rule_vip = self._get_or_create_rule('vip', 15.0)
+        self.rule_none = self._get_or_create_rule('none', 0.0)
+
+    def _get_or_create_rule(self, customer_type, percentage):
+        """Helper para obtener regla existente o crear nueva"""
+        rule = self.rule_model.search([
+            ('customer_type', '=', customer_type),
+            ('company_id', '=', self.company.id),
+            ('active', '=', True)
+        ], limit=1)
+        
+        if not rule:
+            rule = self.rule_model.create({
+                'name': f'Test Rule {customer_type}',
+                'customer_type': customer_type,
+                'discount_percentage': percentage,
+                'active': True,
+            })
+        return rule
 
     def test_create_partner_with_discount_rule(self):
         """Test 1: Crear partner con regla de descuento y verificar customer_type"""

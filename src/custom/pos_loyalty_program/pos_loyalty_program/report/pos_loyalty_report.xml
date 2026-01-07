@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Acción de reporte para histórico de puntos del cliente -->
+    <record id="action_report_partner_loyalty_history" model="ir.actions.report">
+        <field name="name">Histórico de Puntos de Fidelización</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pos_loyalty_program.report_partner_loyalty_history_template</field>
+        <field name="report_file">pos_loyalty_program.report_partner_loyalty_history_template</field>
+        <field name="print_report_name">'Puntos_Fidelizacion_%s' % (object.name)</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
+

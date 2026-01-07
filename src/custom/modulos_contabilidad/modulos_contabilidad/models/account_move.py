@@ -90,8 +90,9 @@ class AccountMove(models.Model):
 
         for line in self.invoice_line_ids:
             # Solo aplicar a líneas de producto sin descuento previo
+            # En Odoo 17, display_type puede ser 'product' o False para líneas normales
             if (
-                not line.display_type
+                line.display_type in ('product', False)
                 and (line.discount == 0 or line.discount == 0.0)
                 and line.product_id
             ):

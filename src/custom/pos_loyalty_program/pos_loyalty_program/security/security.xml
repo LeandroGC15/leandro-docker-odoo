@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Categoría del Programa de Fidelización -->
+        <record id="module_category_pos_loyalty" model="ir.module.category">
+            <field name="name">Programa de Fidelización POS</field>
+            <field name="description">Permisos para gestionar el programa de fidelización en Punto de Venta</field>
+            <field name="sequence">35</field>
+        </record>
+
+        <!-- Grupo para usuarios que pueden ver puntos de fidelización -->
+        <record id="group_pos_loyalty_user" model="res.groups">
+            <field name="name">Usuario / Fidelización POS</field>
+            <field name="category_id" ref="module_category_pos_loyalty"/>
+            <field name="implied_ids" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+            <field name="comment">Puede ver puntos de fidelización de clientes y el histórico</field>
+        </record>
+
+        <!-- Grupo para managers que pueden gestionar el programa -->
+        <record id="group_pos_loyalty_manager" model="res.groups">
+            <field name="name">Manager / Fidelización POS</field>
+            <field name="category_id" ref="module_category_pos_loyalty"/>
+            <field name="implied_ids" eval="[(4, ref('group_pos_loyalty_user'))]"/>
+            <field name="comment">Puede configurar el programa de fidelización y hacer ajustes de puntos</field>
+        </record>
+
+        <!-- Secuencia para el histórico de puntos -->
+        <record id="seq_pos_loyalty_history" model="ir.sequence">
+            <field name="name">Histórico de Fidelización POS</field>
+            <field name="code">pos.loyalty.history</field>
+            <field name="prefix">FID/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+    </data>
+    
+    <data noupdate="1">
+        <!-- Regla de registro: Usuarios de POS pueden ver el histórico de fidelización -->
+        <record id="loyalty_history_rule_pos_user" model="ir.rule">
+            <field name="name">Fidelización: Usuarios de POS pueden leer histórico</field>
+            <field name="model_id" ref="model_pos_loyalty_history"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        
+        <!-- Regla de registro: Managers de POS tienen acceso completo -->
+        <record id="loyalty_history_rule_pos_manager" model="ir.rule">
+            <field name="name">Fidelización: Managers de POS tienen acceso completo</field>
+            <field name="model_id" ref="model_pos_loyalty_history"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Regla para el grupo de fidelización manager -->
+        <record id="loyalty_history_rule_loyalty_manager" model="ir.rule">
+            <field name="name">Fidelización: Managers de fidelización tienen acceso completo</field>
+            <field name="model_id" ref="model_pos_loyalty_history"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_pos_loyalty_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+    </data>
+</odoo>
+
